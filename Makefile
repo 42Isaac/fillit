@@ -28,7 +28,7 @@ all:
 	gcc $(CFLAGS) $(INCLUDES) -o $(NAME)
 
 clean:
-	-@$(MAKE) clean -C libft -s
+	-@$(MAKE) clean -C libft_1 -s
 	-@rm -f $(NAME)
 	-@rm -f -r $(NAME).dSYM
 
