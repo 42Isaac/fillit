@@ -13,7 +13,7 @@
 NAME		= fillit
 CFLAGS		= -Wall -Werror -Wextra
 
-INCLUDES	= $(wildcard *.c)
+INCLUDES	= $(wildcard *.c) libft_1/libft.a
 
 .PHONY: silent show all clean fclean re
 
@@ -24,10 +24,12 @@ debug:
 	make all CFLAGS='$(CFLAGS) -g'
 
 all:
-	gcc $(CFLAGS) $(INCLUDES) libft_1/libft.a -o $(NAME)
+	$(MAKE) all -C libft_1
+	gcc $(CFLAGS) $(INCLUDES) -o $(NAME)
 
 clean:
+	-@$(MAKE) clean -C libft -s
 	-@rm -f $(NAME)
-	-@rm -r $(NAME).dSYM
+	-@rm -f -r $(NAME).dSYM
 
-re: fclean all
+re: clean all
