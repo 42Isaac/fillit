@@ -23,12 +23,16 @@ silent:
 debug:
 	make all CFLAGS='$(CFLAGS) -g'
 
-all:
+all: $(NAME)
+
+$(NAME):
 	$(MAKE) all -C libft_1
 	gcc $(CFLAGS) $(INCLUDES) -o $(NAME)
 
 clean:
 	-@$(MAKE) clean -C libft_1 -s
+
+fclean:
 	-@rm -f $(NAME)
 	-@rm -f -r $(NAME).dSYM
 
