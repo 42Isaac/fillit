@@ -13,7 +13,8 @@
 NAME		= fillit
 CFLAGS		= -Wall -Werror -Wextra
 
-OBJ	= $(patsubst %.c,%.o,$(wildcard *.c))
+#OBJ	= $(patsubst %.c,%.o,$(wildcard *.c))
+OBJ		= $(wildcard *.c)
 
 .PHONY: silent show all clean fclean re
 
@@ -28,8 +29,9 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(MAKE) all -C libft_1
 	cp libft_1/libft.a ./$(NAME)
-	ar -rc $(NAME) $(OBJ)
-	ranlib $(NAME)
+	gcc $(CFLAGS) libft_1/libft.a -o $(NAME)
+#	ar -rc $(NAME) $(OBJ)
+#	ranlib $(NAME)
 
 clean:
 	-@rm -f $(OBJ)
