@@ -24,7 +24,6 @@ debug:
 	make all CFLAGS='$(CFLAGS) -g'
 
 all: $(NAME)
-	gcc $(CFLAGS) $(INCLUDES) -o $(NAME)
 
 $(NAME): $(OBJ)
 	$(MAKE) all -C libft_1
@@ -33,10 +32,12 @@ $(NAME): $(OBJ)
 	ranlib $(NAME)
 
 clean:
+	-@rm -f $(OBJ)
 	-@$(MAKE) clean -C libft_1 -s
 
 fclean: clean
 	-@rm -f $(NAME)
 	-@rm -f -r $(NAME).dSYM
+	-@$(MAKE) fclean -C libft_1 -s
 
 re: fclean all
