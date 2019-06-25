@@ -13,7 +13,7 @@
 NAME		= fillit
 CFLAGS		= -Wall -Werror -Wextra
 
-INCLUDES	= $(wildcard *.c) libft_1/libft.a
+INCLUDES	= $(patsubst %.c,%.o,$(wildcard *.c)) libft_1/libft.a
 
 .PHONY: silent show all clean fclean re
 
@@ -32,8 +32,8 @@ $(NAME):
 clean:
 	-@$(MAKE) clean -C libft_1 -s
 
-fclean:
+fclean: clean
 	-@rm -f $(NAME)
 	-@rm -f -r $(NAME).dSYM
 
-re: clean all
+re: fclean all
