@@ -5,31 +5,31 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlagos <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/05/06 13:37:02 by jlagos            #+#    #+#             */
-/*   Updated: 2019/05/06 13:37:04 by jlagos           ###   ########.fr       */
+/*   Created: 2019/06/25 10:21:49 by jlagos            #+#    #+#             */
+/*   Updated: 2019/06/25 10:22:14 by jlagos           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "tetrominoes.h"
 
-int		starting_board_size(double num)
+int			starting_board_size(double num)
 {
-	double 	lo;
-	double 	hi;
-	double 	mid;
+	double	lo;
+	double	hi;
+	double	mid;
 	int		i;
 
 	lo = 0;
 	hi = num;
 	i = -1;
 	while (++i < 1000)
-  	{
-		mid = (lo+hi)/2;
-    	if (mid * mid == num)
-	 	 	return ((int)mid);
-    	if (mid * mid > num) 
+	{
+		mid = (lo + hi) / 2;
+		if (mid * mid == num)
+			return ((int)mid);
+		if (mid * mid > num)
 			hi = mid;
-    	else
+		else
 			lo = mid;
 	}
 	i = (int)mid;
@@ -40,9 +40,9 @@ int		starting_board_size(double num)
 	return ((int)mid);
 }
 
-Tetrom		*locate_prev_piece(Tetrom *head, char letter)
+t_tetrom	*locate_piece(t_tetrom *head, char letter)
 {
-	Tetrom *tetrom;
+	t_tetrom *tetrom;
 
 	tetrom = head;
 	if (letter < 'A')
@@ -56,50 +56,74 @@ Tetrom		*locate_prev_piece(Tetrom *head, char letter)
 	return (tetrom);
 }
 
-/*
-** resets piece coordinates to the upper most left corner of grid
-*/
-void	get_reset_coordinates(Tetrom *tetrom, char *str)
+void		get_reset_coordinates(t_tetrom *tetrom, char *str)
 {
-	int		i;
-	int		j;
-	int		curr;
+	t_point p;
 
-	i = -1;
-	j = -1;
-	curr = 0;
-	while (tetrom->piece[++i] && curr != 4)
+	p.i = -1;
+	p.j = -1;
+	p.curr = 0;
+	while (tetrom->piece[++p.i] && p.curr != 4)
 	{
-		while (tetrom->piece[i][++j])
+		while (tetrom->piece[p.i][++p.j])
 		{
-			if (tetrom->piece[i][j] == '#')
+			if (tetrom->piece[p.i][p.j] == '#')
 			{
 				if (!ft_strcmp(str, "row"))
-					tetrom->row[curr] = i;
+					tetrom->row[p.curr] = p.i;
 				else if (!ft_strcmp(str, "col"))
-					tetrom->col[curr] = j;
+					tetrom->col[p.curr] = p.j;
 				else if (!ft_strcmp(str, "both"))
 				{
-					tetrom->row[curr] = i;
-					tetrom->col[curr] = j;
+					tetrom->row[p.curr] = p.i;
+					tetrom->col[p.curr] = p.j;
 				}
-				curr++;
+				p.curr++;
 			}
 		}
-		j = -1;
+		p.j = -1;
 	}
 }
 
-char 	**ft_2dstrdup(char **s1, int size)
+char		**convert_bitfield(t_tetrom *start, int dim)
 {
-	char 	**dup;
-	int 	i;
+	t_tetrom	*curr;
+	char		**grid;
+	int			i;
 
-	dup = ft_2dstrnew(size);
+	curr = start;
+	grid = create_empty_grid(dim);
 	i = -1;
-	while (++i < size)
-		ft_strncpy(dup[i], s1[i], size);
-	dup[i] = NULL;
-	return (dup);
+	while (curr)
+	{
+		while (++i < 4)
+			grid[curr->row[i]][curr->col[i]] = curr->alphabet;
+		i = -1;
+		curr = curr->next;
+	}
+	return (grid);
 }
 
+void		insert_spaces(int *s, int *i, int *flag, char *str)
+{
+	while ((((*s) += 5) <= 15))
+	{
+		if (str[(*i) + (*s)] == '#' || str[(*i) + (*s)] == ' ')
+		{
+			if ((*i) != 0 && str[((*i) - 1) + (*s)] == '.')
+				(*flag) += check_if_insert_space(str, (*i) - 1 + (*s));
+			if (str[((*i) + 1) + (*s)] == '.')
+				(*flag) += check_if_insert_space(str, (*i) + 1 + (*s));
+			if (((*i) + (*s)) > 4 && str[((*i) + (*s)) - 5] == '.')
+				(*flag) += check_if_insert_space(str, (*i) + (*s) - 5);
+			if (((*i) + (*s)) < 14 && str[((*i) + (*s)) + 5] == '.')
+				(*flag) += check_if_insert_space(str, (*i) + (*s) + 5);
+		}
+	}
+	(*s) = -5;
+	if (*flag)
+	{
+		(*i) = -1;
+		(*flag) = 0;
+	}
+}

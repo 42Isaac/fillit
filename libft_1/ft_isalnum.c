@@ -1,42 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_isalnum.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlagos <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/06/25 10:22:31 by jlagos            #+#    #+#             */
-/*   Updated: 2019/06/25 10:22:46 by jlagos           ###   ########.fr       */
+/*   Created: 2018/10/31 16:05:22 by jlagos            #+#    #+#             */
+/*   Updated: 2018/12/06 19:21:27 by jlagos           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "tetrominoes.h"
+#include "libft.h"
 
-int		main(int ac, char **ag)
+int		ft_isalnum(int c)
 {
-	t_tetrom	start;
-	t_tetrom	*head;
-	int			fd;
-	int			num_of_pieces;
-	char		**board;
-
-	if (ac == 2)
+	if (c >= '0' && c <= 'z')
 	{
-		fd = open(ag[1], O_RDONLY);
-		num_of_pieces = 0;
-		start.next = NULL;
-		if (fd < 0)
-		{
-			ft_putstr("error\n");
+		if ((c > '9' && c < 'A') || (c > 'Z' && c < 'a'))
 			return (0);
-		}
-		if (!(head = assemble_tetrominoes(&start, &num_of_pieces, fd)))
-		{
-			ft_putstr("error\n");
-			return (0);
-		}
-		board = fillit(head, num_of_pieces);
-		print_grid(board);
+		return (1);
 	}
 	return (0);
 }

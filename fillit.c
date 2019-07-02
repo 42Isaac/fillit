@@ -5,14 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlagos <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/12 12:46:29 by jlagos            #+#    #+#             */
-/*   Updated: 2019/03/26 11:00:04 by jlagos           ###   ########.fr       */
+/*   Created: 2019/06/25 10:19:31 by jlagos            #+#    #+#             */
+/*   Updated: 2019/06/25 10:19:58 by jlagos           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "tetrominoes.h"
 
-int		shift_coordinates(Tetrom *tetrom, int size)
+int			shift_coordinates(t_tetrom *tetrom, int size)
 {
 	int i;
 	int	j;
@@ -41,108 +41,100 @@ int		shift_coordinates(Tetrom *tetrom, int size)
 	return (1);
 }
 
-int		store_place_piece(Tetrom *tetrom, char **grid, int dim)
+int			store_place_piece(t_tetrom *tetrom, uint64_t *grid, int dim)
 {
-	int		i;
+	unsigned int	k_bit;
+	int				i;
 
 	i = -1;
-	while (check_available_spot(tetrom, grid))
+	k_bit = 0;
+	while (check_available_spot(tetrom, grid, dim))
 		if (!shift_coordinates(tetrom, dim))
 			return (0);
-	if (ft_2dstrlen(grid) >= tetrom->height)
+	while (++i < 4)
 	{
-		while (++i < 4)
-			grid[tetrom->row[i]][tetrom->col[i]] = tetrom->alphabet;
+		k_bit = (tetrom->row[i] * dim) + tetrom->col[i];
+		bit_field_write(k_bit, 1, grid);
 	}
-	else
-		return (0);
 	return (1);
 }
 
-void		reset_piece_coordinates(Tetrom *head)
+void		clear_all_pieces(t_tetrom *start, char to_place_p,
+uint64_t *grid, int dim)
 {
-	Tetrom	*curr;
-
-	curr = head;
-	while (curr)
-	{
-		get_reset_coordinates(curr, "both");
-		curr = curr->next;
-	}
-}
-
-void		clear_all_pieces(Tetrom *start, char **grid)
-{
-	Tetrom	*curr;
+	t_tetrom		*curr;
+	unsigned int	k_bit;
+	unsigned int	flag;
+	int				i;
 
 	curr = start;
-	while (curr)
+	k_bit = 0;
+	flag = 1;
+	i = -1;
+	while (curr && curr->alphabet != to_place_p)
 	{
-		clear_piece(grid, curr->alphabet);
+		while (++i < 4)
+		{
+			k_bit = (curr->row[i] * dim) + curr->col[i];
+			flag = flag << k_bit;
+			flag = ~flag;
+			*grid = (*grid) & flag;
+			flag = ~flag;
+			flag = flag >> k_bit;
+		}
+		i = -1;
 		curr = curr->next;
 	}
 }
 
-/*
-** Undoes previous placed piece, shifts over to the next available spot
-** Function will return 0 ONLY if the piece cannot be shift any further
-** Before it returns 0, it will reset piece back to the most upper left it can be 
-** 
-*/
-int		undo_prev_piece(Tetrom *head, char prev_letter, char **grid, int dim)
+int			undo_prev_piece(t_tetrom *head, t_tetrom **tetrom, uint64_t *grid,
+int dim)
 {
-	Tetrom	*tetrom;
-	int		i;
+	t_tetrom	*curr_prev;
 
-	i = -1;
-	//printf("Undoing: %c\nTo place: %c\nThe piece to place:\n", prev_letter, prev_letter + 1);
-	if (!(tetrom = locate_prev_piece(head, prev_letter)))
-		return (2);
-	clear_all_pieces(tetrom, grid);
-	if (!shift_coordinates(tetrom, dim) || !store_place_piece(tetrom, grid, dim))
+	curr_prev = locate_piece(head, (*tetrom)->alphabet - 1);
+	while (curr_prev)
 	{
-		get_reset_coordinates(tetrom, "both");
-		store_place_piece(tetrom, grid, dim);
-		return (0);
+		clear_all_pieces(curr_prev, (*tetrom)->alphabet, grid, dim);
+		if (!shift_coordinates(curr_prev, dim) ||
+			!store_place_piece(curr_prev, grid, dim))
+		{
+			get_reset_coordinates(curr_prev, "both");
+			store_place_piece(curr_prev, grid, dim);
+			curr_prev = locate_piece(head, curr_prev->alphabet - 1);
+		}
+		else
+		{
+			(*tetrom) = locate_piece(head, curr_prev->alphabet + 1);
+			return (1);
+		}
 	}
-	return (1);
+	(*tetrom) = locate_piece(head, 'A');
+	return (0);
 }
 
-char	**fillit(Tetrom *tetrom, int num_of_tetrom)
+char		**fillit(t_tetrom *tetrom, int num_of_tetrom)
 {
-	Tetrom	*head;
-	int		dim;
-	char 	**grid;
+	t_tetrom			*head;
+	int					dim;
+	uint64_t			grid;
 
 	head = tetrom;
 	dim = starting_board_size((double)num_of_tetrom * 4);
 	while (tetrom->height > dim)
 		dim++;
-	grid = create_empty_grid(dim);
+	grid = 0;
 	while (tetrom)
 	{
-		if (!store_place_piece(tetrom, grid, dim))
+		if (!store_place_piece(tetrom, &grid, dim))
 		{
-			while (!undo_prev_piece(head, tetrom->alphabet - 1, grid, dim))
-			{
-				tetrom = locate_prev_piece(head, tetrom->alphabet - 1);
-				if (tetrom->alphabet == 'A')
-				{
-					ft_strdel(grid);
-					grid = create_empty_grid(++dim);
-					reset_piece_coordinates(head);
-					break ;
-				}
-			}
-			get_reset_coordinates(tetrom, "both");
+			if (!undo_prev_piece(head, &tetrom, &grid, dim))
+				clear_reset_pieces(head, &grid, &dim);
 		}
 		else
-		{
 			tetrom = tetrom->next;
-			if (tetrom)
-				get_reset_coordinates(tetrom, "both");
-		}
+		if (tetrom)
+			get_reset_coordinates(tetrom, "both");
 	}
-	print_grid(grid);
-	return (grid);
+	return (convert_bitfield(head, dim));
 }

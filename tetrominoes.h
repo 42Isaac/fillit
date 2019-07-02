@@ -13,37 +13,50 @@
 #ifndef TETROMINOES_H
 # define TETROMINOES_H
 # define BUFFER_SIZE 20
+# define FIELD_WIDTH 1
 # include <stdlib.h>
 # include <stdio.h>
 # include <fcntl.h>
-# include "./libft_1/includes/libft.h"
+# include <stdint.h>
+# include "./libft_1/libft.h"
 
-typedef struct Tetrominoes
+typedef struct			s_tetrom
 {
 	char				**piece;
 	char				alphabet;
-	int					height;
 	int					row[4];
 	int					col[4];
-	struct Tetrominoes	*next;
-}Tetrom;
+	int					height;
+	struct s_tetrom		*next;
+}						t_tetrom;
 
-Tetrom		*assemble_tetrominoes(Tetrom *tetrom, int *tetrom_count, int fd);
-Tetrom		*locate_prev_piece(Tetrom *head, char letter);
-char		**fillit(Tetrom *tetrom, int num_of_tetrom);
-char    	**clear_piece(char **grid, char block);
-char		**create_empty_grid(int len);
-char		**ft_2dstrcpy(char **dst, char **src);
-char 		**ft_2dstrdup(char **s1, int size);
-void    	solve_square(Tetrom *head, char **grid);
-void		get_reset_coordinates(Tetrom *tetrom, char *str);
-void		clear_all_pieces(Tetrom *start, char **grid);
-void    	print_grid(char **grid);
-int			ft_2dstrlen(char **str_arr);
-int			shift_coordinates(Tetrom *tetrom, int size);
-int			check_available_spot(Tetrom *tetrom, char **grid);
-int			store_place_piece(Tetrom *tetrom, char **grid, int dim);
-int			undo_prev_piece(Tetrom *head, char prev_letter, char **grid, int dim);
-int			starting_board_size(double num);
+typedef struct			s_point
+{
+	int i;
+	int j;
+	int curr;
+}						t_point;
+
+t_tetrom				*assemble_tetrominoes(t_tetrom *tetrom,
+int *t_count, int fd);
+t_tetrom				*locate_piece(t_tetrom *head, char letter);
+char					**fillit(t_tetrom *tetrom, int num_of_tetrom);
+char					**create_empty_grid(int len);
+char					**convert_bitfield(t_tetrom *start, int dim);
+void					get_reset_coordinates(t_tetrom *tetrom, char *str);
+void					clear_reset_pieces(t_tetrom *head, uint64_t *grid,
+int *dim);
+void					insert_spaces(int *s, int *i, int *flag, char *str);
+void					bit_field_write(unsigned int bit,
+unsigned int value, uint64_t *byte);
+void					print_grid(char **grid);
+void					print_bits32(unsigned int octet);
+int						check_if_insert_space(char *str, int index);
+int						shift_coordinates(t_tetrom *tetrom, int size);
+int						check_available_spot(t_tetrom *tetrom,
+uint64_t *grid, int dim);
+int						store_place_piece(t_tetrom *tetrom, uint64_t *grid,
+int dim);
+int						starting_board_size(double num);
 
 #endif

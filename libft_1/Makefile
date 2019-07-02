@@ -1,40 +1,35 @@
 # **************************************************************************** #
+#
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: jlagos <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2019/06/21 14:10:04 by jlagos            #+#    #+#              #
-#    Updated: 2019/06/21 14:10:06 by jlagos           ###   ########.fr        #
+#    Created: 2018/11/18 12:23:53 by jlagos            #+#    #+#              #
+#    Updated: 2018/12/13 14:24:17 by jlagos           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME		= fillit
+NAME		= libft.a
 CFLAGS		= -Wall -Werror -Wextra
 
-INCLUDES = $(wildcard *.c)
+OBJ			= $(patsubst %.c,%.o,$(wildcard ./*.c))
 
 .PHONY: silent show all clean fclean re
 
 silent:
 	@make all -s
 
-debug:
-	make all CFLAGS='$(CFLAGS) -g'
-
 all: $(NAME)
 
-$(NAME): $(INCLUDES)	
-	$(MAKE) all -C libft_1
-	gcc $(CFLAGS) $(INCLUDES) libft_1/libft.a -o $(NAME)
+$(NAME): $(OBJ)
+	ar -rcs $(NAME) $(OBJ)
 
 clean:
-	-@$(MAKE) clean -C libft_1 -s
+	@rm -f $(OBJ)
 
 fclean: clean
-	-@rm -f $(NAME)
-	-@rm -f -r $(NAME).dSYM
-	-@$(MAKE) fclean -C libft_1 -s
+	@rm -f $(NAME)
 
 re: fclean all
