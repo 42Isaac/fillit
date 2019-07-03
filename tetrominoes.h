@@ -38,25 +38,25 @@ typedef struct			s_point
 }						t_point;
 
 t_tetrom				*assemble_tetrominoes(t_tetrom *tetrom,
-int *t_count, int fd);
+							int *t_count, int fd);
 t_tetrom				*locate_piece(t_tetrom *head, char letter);
 char					**fillit(t_tetrom *tetrom, int num_of_tetrom);
 char					**create_empty_grid(int len);
 char					**convert_bitfield(t_tetrom *start, int dim);
 void					get_reset_coordinates(t_tetrom *tetrom, char *str);
 void					clear_reset_pieces(t_tetrom *head, uint64_t *grid,
-int *dim);
+							int *dim);
 void					insert_spaces(int *s, int *i, int *flag, char *str);
 void					bit_field_write(unsigned int bit,
-unsigned int value, uint64_t *byte);
+							unsigned int value, uint64_t *byte);
 void					print_grid(char **grid);
 void					print_bits32(unsigned int octet);
 int						check_if_insert_space(char *str, int index);
 int						shift_coordinates(t_tetrom *tetrom, int size);
 int						check_available_spot(t_tetrom *tetrom,
-uint64_t *grid, int dim);
+							uint64_t *grid, int dim);
 int						store_place_piece(t_tetrom *tetrom, uint64_t *grid,
-int dim);
+							int dim);
 int						starting_board_size(double num);
 
 #endif

@@ -25,12 +25,7 @@ int		main(int ac, char **ag)
 		fd = open(ag[1], O_RDONLY);
 		num_of_pieces = 0;
 		start.next = NULL;
-		if (fd < 0)
-		{
-			ft_putstr("error\n");
-			return (0);
-		}
-		if (!(head = assemble_tetrominoes(&start, &num_of_pieces, fd)))
+		if (fd < 0 || !(head = assemble_tetrominoes(&start, &num_of_pieces, fd)))
 		{
 			ft_putstr("error\n");
 			return (0);
@@ -38,5 +33,7 @@ int		main(int ac, char **ag)
 		board = fillit(head, num_of_pieces);
 		print_grid(board);
 	}
+	else
+		ft_putstr("usage: ./fillit source_file\n");
 	return (0);
 }

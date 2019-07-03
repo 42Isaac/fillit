@@ -12,8 +12,6 @@
 
 #include "tetrominoes.h"
 
-#include "tetrominoes.h"
-
 unsigned int		check_invalid_tetrom(char *str)
 {
 	int i;
