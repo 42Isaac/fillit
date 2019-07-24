@@ -12,18 +12,6 @@
 
 #include "tetrominoes.h"
 
-void		print_grid(char **grid)
-{
-	int	i;
-
-	i = -1;
-	while (grid[++i])
-	{
-		ft_putstr(grid[i]);
-		ft_putchar('\n');
-	}
-}
-
 void		clear_reset_pieces(t_tetrom *head, uint64_t *grid, int *dim)
 {
 	t_tetrom	*curr;
@@ -31,11 +19,23 @@ void		clear_reset_pieces(t_tetrom *head, uint64_t *grid, int *dim)
 	curr = head;
 	while (curr)
 	{
-		get_reset_coordinates(curr, "both");
+		get_rc_piece(curr);
 		curr = curr->next;
 	}
 	(*dim)++;
-	ft_memset(grid, 0, sizeof(*grid));
+	(*grid) = 0;
+}
+
+void		get_rc_piece(t_tetrom *curr)
+{
+	int		i;
+
+	i = -1;
+	while (++i < 4)
+	{
+		curr->row[i] = curr->reset_row[i];
+		curr->col[i] = curr->reset_col[i];
+	}
 }
 
 /*
@@ -44,19 +44,6 @@ void		clear_reset_pieces(t_tetrom *head, uint64_t *grid, int *dim)
 ** filter the existing value, reset to zero (line 54)
 ** set the bit field (line 55)
 */
-
-void		bit_field_write(unsigned int bit, unsigned int value,
-uint64_t *byte)
-{
-	uint64_t mask;
-
-	mask = 1;
-	value = value << bit;
-	mask = mask << bit;
-	mask ^= 0xFFFFFFFF;
-	*byte &= mask;
-	*byte |= value;
-}
 
 char		**create_empty_grid(int len)
 {
@@ -68,6 +55,14 @@ char		**create_empty_grid(int len)
 	while (++i < len)
 		ft_memset(grid[i], '.', len);
 	return (grid);
+}
+
+int			shift_c_to_pos(t_tetrom *tetrom, uint64_t *grid, int dim)
+{
+	while (check_available_spot(tetrom, grid, dim))
+		if (!shift_coordinates(tetrom, dim))
+			return (0);
+	return (1);
 }
 
 int			check_available_spot(t_tetrom *tetrom, uint64_t *grid, int dim)

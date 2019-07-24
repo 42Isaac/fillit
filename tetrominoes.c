@@ -12,6 +12,12 @@
 
 #include "tetrominoes.h"
 
+/*
+** Checks if the tetromino is a valid shape.
+**
+** Returns 0 on valid shape, 1 on invalid shape.
+*/
+
 unsigned int		check_invalid_tetrom(char *str)
 {
 	int i;
@@ -38,33 +44,36 @@ unsigned int		check_invalid_tetrom(char *str)
 	return (1);
 }
 
+/*
+**	Checks the piece for proper formatting. Doesn't check if the
+**	piece is a valid shape, check_invalid_tetrom does that.
+**
+**	Returns 0 on invalid format, 1 on valid.
+*/
+
 int					check_if_lines_valid(char *str)
 {
 	int			i;
-	int			check_nl;
 	int			block_nbr;
 
 	i = -1;
-	check_nl = 4;
 	block_nbr = 0;
 	while (str[++i])
 	{
 		if (str[i] == '#')
 			block_nbr++;
-		if (i == check_nl)
-		{
-			if (str[i] == '\n')
-				check_nl += 5;
-			else
-				return (0);
-		}
-		else if (str[i] != '.' && str[i] != '#')
-			return (0);
-		if (block_nbr > 4)
+		if ((i + 1) % 5 == 0 ? str[i] != '\n' : str[i] != '.' && str[i] != '#')
 			return (0);
 	}
-	return (1);
+	return ((block_nbr == 4) ? 1 : 0);
 }
+
+/*
+**	Checks if the '.' located at index in *str needs to be replaced with ' ',
+**	if it does, makes the replacement.
+**
+**	Returns 1 on space placed, 0 on no change to *str.
+*/
 
 int					check_if_insert_space(char *str, int index)
 {
@@ -88,20 +97,20 @@ int					check_if_insert_space(char *str, int index)
 }
 
 /*
-** create_store_piece(Tetrom *tetrom, char *str)
-** Function traverses through string to locate where to assign character space
-** The reason I do this is to get the sole shape of the piece
-** in string array form (calling ft_strsplit) without it being inside a 4x4 grid
-** Example:
-** (Before in char array form)		(After in string array form)
-** ....(\n)							##
-** .##.(\n)			 			 	 #
-** . #.(\n)			 			 	 #
-** . #.(\n)
-** Then functions stores the height, width, and piece itself
+**	Function traverses through str (string containing piece from the file)
+**	to locate where to assign ' '.
+**	The reason I do this is to get the sole shape of the piece in string array 
+**	form (calling ft_strsplit).
+**	Example:
+**	(before changes)		(with ' ' added)		(After using ft_strsplit)
+**	 ....(\n)				 ....(\n)				 ##(\0)
+**	 .##.(\n)				 .##.(\n)			 	  #(\0)
+**	 ..#.(\n)				 . #.(\n)			 	  #(\0)
+**	 ..#.(\n)(\0)			 . #.(\n)(\0)
+**	Then it stores the size and piece itself(from ft_strsplit) in the list.
 */
 
-void				create_store_piece(t_tetrom *tetrom, char *str)
+void				create_store_piece(t_tetrom *tetrom, char *str, int *t_count)
 {
 	static char		letter;
 	int				i;
@@ -121,41 +130,40 @@ void				create_store_piece(t_tetrom *tetrom, char *str)
 	tetrom->piece = ft_strsplit(str, '.');
 	tetrom->alphabet = letter++;
 	tetrom->height = ft_2dstrlen(tetrom->piece);
-	get_reset_coordinates(tetrom, "both");
+	(*t_count)++;
+	get_reset_coordinates(tetrom);
 }
 
 /*
-** Tetrom *assemble_tetrominoes(Tetrom *tetrom, int fd)
-** Parses through the file, creates a list if piece is valid and
-** adds it onto the linked list of pieces
+**	Parses through the file, and creates a list for every valid piece
+**	that is encountered and adds it onto the linked list of pieces.
+**
+**	Returns 0 on failure or invalid file, 1 on success. Blame Jonny for this.
 */
 
-t_tetrom			*assemble_tetrominoes(t_tetrom *tetrom, int *t_count,
+int					assemble_tetrominoes(t_tetrom *tetrom, int *t_count,
 int fd)
 {
-	t_tetrom		*head;
 	t_tetrom		*tmp;
 	char			line[BUFFER_SIZE + 1];
 
-	head = tetrom;
-	while (read(fd, line, BUFFER_SIZE))
+	while (read(fd, line, BUFFER_SIZE) > 0)
 	{
 		line[BUFFER_SIZE] = '\0';
 		if (!check_if_lines_valid(line) || !check_invalid_tetrom(line))
-			return (NULL);
+			return (0);
 		if (!tetrom)
 		{
 			if (!(tetrom = (t_tetrom *)malloc(sizeof(*tetrom))))
-				return (NULL);
+				return (0);
 			tmp->next = tetrom;
 			tetrom->next = NULL;
 		}
-		create_store_piece(tetrom, line);
+		create_store_piece(tetrom, line, t_count);
 		tmp = tetrom;
 		tetrom = tetrom->next;
-		(*t_count)++;
-		if (!read(fd, line, 1))
-			return (head);
+		if (!read(fd, line, 1) || line[0] != '\n')
+			return ((read(fd, line, 1)) == 0 ? 1 : 0);
 	}
-	return (NULL);
+	return (0);
 }

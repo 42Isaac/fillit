@@ -56,7 +56,7 @@ t_tetrom	*locate_piece(t_tetrom *head, char letter)
 	return (tetrom);
 }
 
-void		get_reset_coordinates(t_tetrom *tetrom, char *str)
+void		get_reset_coordinates(t_tetrom *tetrom)
 {
 	t_point p;
 
@@ -69,15 +69,10 @@ void		get_reset_coordinates(t_tetrom *tetrom, char *str)
 		{
 			if (tetrom->piece[p.i][p.j] == '#')
 			{
-				if (!ft_strcmp(str, "row"))
-					tetrom->row[p.curr] = p.i;
-				else if (!ft_strcmp(str, "col"))
-					tetrom->col[p.curr] = p.j;
-				else if (!ft_strcmp(str, "both"))
-				{
-					tetrom->row[p.curr] = p.i;
-					tetrom->col[p.curr] = p.j;
-				}
+				tetrom->reset_row[p.curr] = p.i;
+				tetrom->reset_col[p.curr] = p.j;
+				tetrom->row[p.curr] = p.i;
+				tetrom->col[p.curr] = p.j;
 				p.curr++;
 			}
 		}
