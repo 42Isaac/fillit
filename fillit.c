@@ -115,6 +115,13 @@ int dim)
 	return (0);
 }
 
+/*
+**	Does all the hard work. Takes the linked list,
+**	builds the board, and places the peices.
+**
+**	Returns grid that needs to be printed to the standard output.
+*/
+
 char		**fillit(t_tetrom *tetrom, int num_of_tetrom)
 {
 	t_tetrom			*head;
@@ -122,8 +129,8 @@ char		**fillit(t_tetrom *tetrom, int num_of_tetrom)
 	uint64_t			grid;
 
 	head = tetrom;
-	dim = starting_board_size((double)num_of_tetrom * 4);
-	while (tetrom->height > dim)
+	dim = starting_board_size(num_of_tetrom * 4);
+	while (tetrom->size > dim)
 		dim++;
 	grid = 0;
 	while (tetrom)
