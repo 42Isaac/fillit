@@ -14,7 +14,7 @@
 
 /*
 **	Finds the minimum size of the grid for the number of pieces.
-**	(Hint: it's just the square root, with extra addition sometimes.)
+**	(Hint: it's just the square root.)
 **
 **	Returns the starting board size.
 */
@@ -45,7 +45,7 @@ int			starting_board_size(int num)
     i = factors[num_of_factors];
     while (--num_of_factors >= 0)
         i *= factors[num_of_factors];
-    return (i + 2 > (num / 4) - 2 ? i : (num / 4) % 2 == 0 ? i + 2 : i + 1);
+    return (i);
 }
 
 t_tetrom	*locate_piece(t_tetrom *head, char letter)
