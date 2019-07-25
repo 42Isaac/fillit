@@ -85,8 +85,6 @@ int					check_if_lines_valid(char *str)
 void				create_store_piece(t_tetrom *tetrom, char *str, int *t_count)
 {
 	static char		letter;
-	int				height;
-	int				width;
 	int				i;
 
 	i = -1;
@@ -97,9 +95,8 @@ void				create_store_piece(t_tetrom *tetrom, char *str, int *t_count)
 		str[i] = '.';
 	tetrom->piece = ft_strsplit(str, '.');
 	tetrom->alphabet = letter++;
-	height = ft_2dstrlen(tetrom->piece);
-	width = ft_strlen(tetrom->piece[0]);
-	tetrom->size = height > width ? height : width;
+	tetrom->heigth = ft_2dstrlen(tetrom->piece);
+	tetrom->width = ft_strlen(tetrom->piece[0]);
 	(*t_count)++;
 	get_reset_coordinates(tetrom);
 }

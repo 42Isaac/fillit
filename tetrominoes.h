@@ -27,7 +27,8 @@ typedef struct			s_tetrom
 	int					col[4];
 	int					reset_row[4];
 	int					reset_col[4];
-	int					size;
+	int					heigth;
+	int					width;
 	struct s_tetrom		*next;
 }						t_tetrom;
 
