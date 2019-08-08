@@ -21,32 +21,38 @@
 
 int			starting_board_size(int num)
 {
-    int     factors[10];
-    int     num_of_factors;
-    int     i;
-    int     num_cpy;
+	int		factors[10];
+	int		num_of_factors;
+	int		i;
+	int		num_cpy;
 
-    i = num;
-    num_of_factors = -1;
-    num_cpy = num;
-    while (num_cpy != 1)
-    {
-        while ((i * i) > num_cpy)
-            i--;
-        if ((i * i) % num_cpy == 0)
-        {
-            factors[++num_of_factors] = i;
-            num_cpy /= (i * i);
-            i = num_cpy;
-        }
-        else
-            num_cpy--;
-    }
-    i = factors[num_of_factors];
-    while (--num_of_factors >= 0)
-        i *= factors[num_of_factors];
-    return (i + 2 > (num / 4) - 2 ? i : (num / 4) % 2 == 0 ? i + 2 : i + 1);
+	i = num;
+	num_of_factors = -1;
+	num_cpy = num;
+	while (num_cpy != 1)
+	{
+		while ((i * i) > num_cpy)
+			i--;
+		if ((i * i) % num_cpy == 0)
+		{
+			factors[++num_of_factors] = i;
+			num_cpy /= (i * i);
+		}
+		else
+			num_cpy--;
+	}
+	i = factors[num_of_factors];
+	while (--num_of_factors >= 0)
+		i *= factors[num_of_factors];
+	i = i + 2 > (num / 4) - 2 ? i : i + 1;
+	return ((num / 4) % 2 == 0 ? i + 1 : i);
 }
+
+/*
+**	Finds the list associated with letter in the linked list head.
+**
+**	Returns the list if found, NULL if not found or invalid letter.
+*/
 
 t_tetrom	*locate_piece(t_tetrom *head, char letter)
 {
@@ -95,6 +101,14 @@ void		get_reset_coordinates(t_tetrom *tetrom)
 	}
 }
 
+/*
+**	Creates the grid to be printed to the standard output.
+**	The function assumes all the pieces are all properly placed
+**	and places the pieces based off of their coordinates into the grid.
+**
+**	Returns the grid.
+*/
+
 char		**convert_bitfield(t_tetrom *start, int dim)
 {
 	t_tetrom	*curr_mino;
@@ -115,7 +129,7 @@ char		**convert_bitfield(t_tetrom *start, int dim)
 }
 
 /*
-**	Checks every '.' to see if it needs to be replaced with a ' '.
+**	Checks every '.' in str to see if it needs to be replaced with a ' '.
 **	If it does, make the replacement.
 */
 
@@ -125,17 +139,17 @@ void		insert_spaces(char *str)
 	int		spaces;
 	int		touches;
 
-	i = 0;
+	i = -1;
 	spaces = 0;
-	while (i > -1)
+	while (++i > -1)
 	{
 		if (str[i] == '.')
 		{
 			touches = 0;
-			if ((i != 0 && (str[i - 1] == '#' || str[i - 1] == ' ')) || 
+			if ((i != 0 && (str[i - 1] == '#' || str[i - 1] == ' ')) ||
 			str[i + 1] == '#' || str[i + 1] == ' ')
 				touches++;
-			if ((i > 4 && (str[i - 5] == '#' || str[i - 5] == ' ')) || 
+			if ((i > 4 && (str[i - 5] == '#' || str[i - 5] == ' ')) ||
 			(i < 14 && (str[i + 5] == '#' || str[i + 5] == ' ')))
 				touches++;
 			if (touches >= 2)
@@ -144,6 +158,6 @@ void		insert_spaces(char *str)
 				spaces++;
 			}
 		}
-		i = str[i] ? i + 1 : spaces == 1 ? 0 : -1;
+		i = !str[i] && spaces == 1 ? -1 : -2;
 	}
 }
