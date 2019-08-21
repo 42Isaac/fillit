@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlagos <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/06/25 10:22:31 by jlagos            #+#    #+#             */
-/*   Updated: 2019/06/25 10:22:46 by jlagos           ###   ########.fr       */
+/*   Created: 2019/08/11 15:32:05 by jlagos            #+#    #+#             */
+/*   Updated: 2019/08/11 15:32:15 by jlagos           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,19 @@
 
 void		free_llist(t_tetrom *head)
 {
-	t_tetrom	*curr;
-	t_tetrom	*temp;
+	t_tetrom	*tmp;
 	int			i;
 
-	curr = head;
-	while (curr)
+	while(head)
 	{
 		i = -1;
-		while (curr->piece && curr->piece[++i])
-			ft_strdel(&curr->piece[i]);
-		temp = curr->next;
-		free(curr);
-		curr = temp;
+		while (head->piece[++i])
+			ft_strdel(&head->piece[i]);
+		free(head->piece);
+		tmp = head->next;
+		free(head);
+		head = tmp;
+		ft_
 	}
 }
 
@@ -45,11 +45,15 @@ void		print_grid(char **grid)
 	i = -1;
 	while (grid[++i])
 		ft_putendl(grid[i]);
+	i = -1;
+	while (grid[++i])
+		ft_strdel(&grid[i]);
+	free(grid);
 }
 
 /*
 **	It's main. What do you expect.
-**	It checks to make sure that the file is valid and creates a linked list 
+**	It checks to make sure that the file is valid and creates a linked list
 **	containing all the tetrominos (using assemble_tetrominoes) in the file
 **	before calling fillit.
 **
@@ -62,9 +66,9 @@ int			main(int ac, char **ag)
 	int			fd;
 	int			num_of_pieces;
 
-	if (ac == 2)
+	fd = open(ag[1], O_RDONLY);
+	if (ac == 2 && fd != -1)
 	{
-		fd = open(ag[1], O_RDONLY);
 		num_of_pieces = 0;
 		head = (t_tetrom *)malloc(sizeof(*head));
 		head->next = NULL;
@@ -76,10 +80,10 @@ int			main(int ac, char **ag)
 		}
 		print_grid(fillit(head, num_of_pieces));
 		free_llist(head);
+		close(fd);
+		system("leaks fillit");
 	}
 	else
-		ft_putstr(ac > 2 ? 
-		"\ttoo many parameters\nusage:\t./fillit source_file\n" : 
-		"usage:\t./fillit source_file\n");
+		ft_putstr("usage:\t./fillit source_file\n");
 	return (0);
 }
