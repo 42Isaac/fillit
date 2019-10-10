@@ -1,3 +1,4 @@
+made in colaboration with [jlagos](https://github.com/jonnylagos115)
 # fillit
 fillit is an assignment from 42, the goal is to take Tetris pieces, and find the smallest possible square that the pieces can fit into.
 
